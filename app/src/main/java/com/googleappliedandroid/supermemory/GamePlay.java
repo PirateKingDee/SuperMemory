@@ -1,6 +1,7 @@
 package com.googleappliedandroid.supermemory;
 
 import android.content.Intent;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -37,6 +38,7 @@ public class GamePlay extends AppCompatActivity {
     private Stack<Card> previous;
     private Button left;
     private Button right;
+    private boolean win = false;
     CardButtons button1;
     CardButtons button2;
     CardButtons button3;
@@ -62,6 +64,7 @@ public class GamePlay extends AppCompatActivity {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
 
         answer = new LinkedList<>(game.getSequence());
         stopMem.setOnClickListener(new View.OnClickListener() {
@@ -138,7 +141,7 @@ public class GamePlay extends AppCompatActivity {
 
     public void startMemorizing(int sec){
 
-        int timer = sec*1000;
+        final int timer = sec*1000;
         Handler timerHandle = new Handler();
         Runnable timerRunnable = new Runnable() {
 
@@ -159,7 +162,35 @@ public class GamePlay extends AppCompatActivity {
                 //updateChoices();
             }
         };
-        timerHandle.postDelayed(timerRunnable, timer);
+        //final int timeLeft = sec;
+        new CountDownTimer(timer, 1000){
+            int timeLeft = timer/1000;
+            TextView timerText = (TextView)findViewById(R.id.timer);
+
+            @Override
+            public void onTick(long millisUntilFinished) {
+                timerText.setText(Integer.toString(--timeLeft));
+            }
+
+            @Override
+            public void onFinish() {
+                card.setEnabled(false);
+                card.setVisibility(View.INVISIBLE);
+                setContentView(R.layout.activity_restore_order);
+                setupChoiceButtons();
+                endGame = (Button)findViewById(R.id.end_game);
+                endGame.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //Toast.makeText(getApplicationContext(),"Do better next time", Toast.LENGTH_LONG);
+                        startActivity(gameOverIntent);
+                    }
+                });
+            }
+
+        }.start();
+        //timerHandle.postDelayed(timerRunnable, timer);
+
     }
 
 //    public void getAnswer(){
@@ -204,7 +235,8 @@ public class GamePlay extends AppCompatActivity {
                     }
                     else if(game.getSequence().isEmpty()){
                         Toast.makeText(getApplicationContext(), "Good Job", Toast.LENGTH_SHORT);
-                        endGame();
+                        win = true;
+                        endGame(win);
                     }
                 }
 
@@ -212,7 +244,7 @@ public class GamePlay extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Wrong, try again", Toast.LENGTH_SHORT).show();
                     triesText.setText(Integer.toString(--tries));
                     if(tries == 0){
-                        endGame();
+                        endGame(win);
                     }
                 }
             }
@@ -227,7 +259,8 @@ public class GamePlay extends AppCompatActivity {
                     }
                     else if(game.getSequence().isEmpty()){
                         Toast.makeText(getApplicationContext(), "Good Job", Toast.LENGTH_SHORT);
-                        endGame();
+                        win = true;
+                        endGame(win);
                     }
                 }
 
@@ -235,7 +268,7 @@ public class GamePlay extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Wrong, try again", Toast.LENGTH_SHORT).show();
                     triesText.setText(Integer.toString(--tries));
                     if(tries == 0){
-                        endGame();
+                        endGame(win);
                     }
                 }
             }
@@ -250,7 +283,8 @@ public class GamePlay extends AppCompatActivity {
                     }
                     else if(game.getSequence().isEmpty()){
                         Toast.makeText(getApplicationContext(), "Good Job", Toast.LENGTH_SHORT);
-                        endGame();
+                        win = true;
+                        endGame(win);
                     }
 
                 }
@@ -259,7 +293,7 @@ public class GamePlay extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Wrong, try again", Toast.LENGTH_SHORT).show();
                     triesText.setText(Integer.toString(--tries));
                     if(tries == 0){
-                        endGame();
+                        endGame(win);
                     }
                 }
             }
@@ -274,7 +308,8 @@ public class GamePlay extends AppCompatActivity {
                     }
                     else if(game.getSequence().isEmpty()){
                         Toast.makeText(getApplicationContext(), "Good Job", Toast.LENGTH_SHORT);
-                        endGame();
+                        win = true;
+                        endGame(win);
                     }
                 }
 
@@ -282,15 +317,15 @@ public class GamePlay extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Wrong, try again", Toast.LENGTH_SHORT).show();
                     triesText.setText(Integer.toString(--tries));
                     if(tries == 0){
-                        endGame();
+                        endGame(win);
                     }
                 }
             }
         });
     }
-    public void endGame(){
+    public void endGame(boolean win){
             //Toast.makeText(getApplicationContext(),"Do better next time", Toast.LENGTH_LONG);
-
+            gameOverIntent.putExtra("WinStatus", win);
             startActivity(gameOverIntent);
     }
 

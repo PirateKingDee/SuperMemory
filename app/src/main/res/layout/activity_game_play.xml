@@ -42,5 +42,28 @@
         android:layout_alignTop="@+id/left"
         android:text="Next" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="30sp"
+        android:text="Time Left: "
+        android:layout_alignBaseline="@+id/timer"
+        android:layout_alignBottom="@+id/timer"
+        android:layout_toLeftOf="@+id/timer"
+        android:layout_toStartOf="@+id/timer"
+        android:layout_marginRight="11dp"
+        android:layout_marginEnd="11dp" />
+
+    <TextView
+        android:id="@+id/timer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="27dp"
+        android:text="0"
+        android:textSize="30sp"
+        android:layout_above="@+id/card"
+        android:layout_alignRight="@+id/card"
+        android:layout_alignEnd="@+id/card" />
+
 
 </RelativeLayout>

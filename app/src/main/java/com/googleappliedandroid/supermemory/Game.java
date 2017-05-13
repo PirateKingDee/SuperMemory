@@ -10,15 +10,17 @@ import java.util.concurrent.TimeUnit;
 public class Game {
 	private int memorizeTime;
 	private ArrayList<Card> deck;
+	private ArrayList<Card> deck2;
 	private Deque<Card> sequence;
 	public Game () { //Constructor - this also creates a full deck of 52 cards in order
 		sequence = new LinkedList<Card>();
 		//same as restoreDeck?
 		char [] suits = {'c', 'd', 'h', 's'};
 		int cardNum = 0, suitNum = 0;
-		deck = new ArrayList();
+		deck = new ArrayList<>();
 		for (int i = 0; i < 52; i++) {
 			deck.add(new Card (cardNum, suits[suitNum]));
+			//deck2.add(new Card (cardNum, suits[suitNum]));
 			cardNum++;
 			if (cardNum == 13) {
 				cardNum = 0;
@@ -30,7 +32,7 @@ public class Game {
 	public void restoreDeck () { //Restore the deck to full 52 cards in order
 		char [] suits = {'d', 'c', 'h', 's'};
 		int cardNum = 0, suitNum = 0;
-		deck = new ArrayList();
+		deck = new ArrayList<>();
 		for (int i = 0; i < 52; i++) {
 			deck.add(new Card (cardNum, suits[suitNum]));
 			cardNum++;
@@ -58,18 +60,22 @@ public class Game {
 			//TimeUnit.SECONDS.sleep(1); //wait until display next card
 			//System.out.println("\n\n\n\n\n\n\n\n\n\n"); //"clear" output
 		}
+
 	}
 	
 	public Card[] guesses () { //will return the correct answer
-		Card answer = sequence.peek(); //store answer by peaking 
+		Card answer = sequence.peek(); //store answer by peaking
+
 		Card [] arr = new Card [4]; //these will be your possible answers
 		Random rand = new Random();
 		int correct = rand.nextInt(4); //decide where to store the answer
 		arr[correct] = answer; 
 		for (int i = 0; i < 4; i++) {
 			if (arr[i] != answer) {
-				arr[i] = deck.get(rand.nextInt(deck.size()));//put random card as an options
+				arr[i]  = deck.get(rand.nextInt(deck.size()));//put random card as an options
+
 			}
+
 			//System.out.println("Card " + (i + 1) + "  " + arr[i].toString());
 		}
 		//sequence.remove(); //move onto the next card in the sequence
