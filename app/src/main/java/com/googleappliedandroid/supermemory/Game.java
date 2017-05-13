@@ -1,5 +1,6 @@
 package com.googleappliedandroid.supermemory;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
@@ -9,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 public class Game {
 	private int memorizeTime;
 	private ArrayList<Card> deck;
-	private Queue <Card> sequence;
+	private Deque<Card> sequence;
 	public Game () { //Constructor - this also creates a full deck of 52 cards in order
 		sequence = new LinkedList<Card>();
 		//same as restoreDeck?

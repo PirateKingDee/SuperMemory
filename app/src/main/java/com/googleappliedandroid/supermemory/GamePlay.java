@@ -9,12 +9,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Queue;
+import java.util.Stack;
 
 public class GamePlay extends AppCompatActivity {
 
@@ -26,18 +32,25 @@ public class GamePlay extends AppCompatActivity {
     private Button endGame;
     private Button stopMem;
     private Game game;
-    private Queue<Card> answer;
+    private int tries = 3;
+    private Deque<Card> answer;
+    private Stack<Card> previous;
+    private Button left;
+    private Button right;
     CardButtons button1;
     CardButtons button2;
     CardButtons button3;
     CardButtons button4;
-    Intent mainActivityIntent;
+    Intent gameOverIntent;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_play);
-        mainActivityIntent = new Intent(GamePlay.this, MainActivity.class);
+        gameOverIntent = new Intent(GamePlay.this, GameOver.class);
         final Intent intent = getIntent();
+        previous = new Stack<Card>();
         card = (ImageView) findViewById(R.id.card);
+        left = (Button) findViewById(R.id.left);
+        right = (Button) findViewById(R.id.right);
         stopMem = (Button) findViewById(R.id.stop_memorize);
         cardNumber = intent.getIntExtra("CARD_NUMBER", 5);
         time = intent.getIntExtra("TIME", 60);
@@ -54,20 +67,57 @@ public class GamePlay extends AppCompatActivity {
         stopMem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(mainActivityIntent);
+                startActivity(gameOverIntent);
             }
         });
 
-        card.setOnClickListener(new View.OnClickListener() {
+//        card.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if(!answer.isEmpty()){
+//                    card.setBackgroundResource(cardMap.get(answer.poll()));
+//                }
+//            }
+//        });
+        left.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                if(!answer.isEmpty()){
-                    card.setBackgroundResource(cardMap.get(answer.poll()));
+            public void onClick (View v) {
+                if (!previous.empty()) {
+                    answer.addFirst(previous.pop());
+                    //prev = previous.pop();
+                    //Card prev = answer.removeLast();
+                    card.setBackgroundResource(cardMap.get(answer.peek()));
+                    //answer.addFirst(prev);
+                    //Log.d("string",prev.toString());
+                    //  previous.push(prev);
+
+                }
+            }
+        });
+        right.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick (View v) {
+                if(!answer.isEmpty()) {
+                    Card current = previous.push(answer.poll());
+                    if(answer.isEmpty()){
+                        answer.addFirst(previous.pop());
+                        card.setBackgroundResource(cardMap.get(answer.peek()));
+                    }
+                    else{
+                        card.setBackgroundResource(cardMap.get(answer.peek()));
+                    }
+
+
+
+                    //  answer.addLast(current);
+                    //previous.push(current);
+
                 }
             }
         });
 
-        card.setBackgroundResource(cardMap.get(answer.poll()));
+        Card current = answer.peek();
+        card.setBackgroundResource(cardMap.get(current));
         startMemorizing(time);
 
 
@@ -103,7 +153,7 @@ public class GamePlay extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         //Toast.makeText(getApplicationContext(),"Do better next time", Toast.LENGTH_LONG);
-                        startActivity(mainActivityIntent);
+                        startActivity(gameOverIntent);
                     }
                 });
                 //updateChoices();
@@ -126,6 +176,8 @@ public class GamePlay extends AppCompatActivity {
 
     public void updateChoices(CardButtons[] buttons){
         Card[] choices = game.guesses();
+        TextView textNum = (TextView)findViewById(R.id .number_text);
+        textNum.setText(Integer.toString(cardNumber-game.getSequence().size()+1));
         for(int i = 0; i < buttons.length; i++){
             buttons[i].setBackgroundResource(cardMap.get(choices[i]));
             buttons[i].setCard(choices[i]);
@@ -138,6 +190,8 @@ public class GamePlay extends AppCompatActivity {
         button2 = (CardButtons) findViewById(R.id.b);
         button3 = (CardButtons) findViewById(R.id.c);
         button4 = (CardButtons) findViewById(R.id.d);
+        final TextView triesText = (TextView)findViewById(R.id.tries);
+        triesText.setText(Integer.toString(tries));
         final CardButtons[] buttons = {button1, button2, button3, button4};
         updateChoices(buttons);
         button1.setOnClickListener(new View.OnClickListener() {
@@ -156,6 +210,10 @@ public class GamePlay extends AppCompatActivity {
 
                 else{
                     Toast.makeText(getApplicationContext(), "Wrong, try again", Toast.LENGTH_SHORT).show();
+                    triesText.setText(Integer.toString(--tries));
+                    if(tries == 0){
+                        endGame();
+                    }
                 }
             }
         });
@@ -175,6 +233,10 @@ public class GamePlay extends AppCompatActivity {
 
                 else{
                     Toast.makeText(getApplicationContext(), "Wrong, try again", Toast.LENGTH_SHORT).show();
+                    triesText.setText(Integer.toString(--tries));
+                    if(tries == 0){
+                        endGame();
+                    }
                 }
             }
         });
@@ -195,6 +257,10 @@ public class GamePlay extends AppCompatActivity {
 
                 else{
                     Toast.makeText(getApplicationContext(), "Wrong, try again", Toast.LENGTH_SHORT).show();
+                    triesText.setText(Integer.toString(--tries));
+                    if(tries == 0){
+                        endGame();
+                    }
                 }
             }
         });
@@ -214,6 +280,10 @@ public class GamePlay extends AppCompatActivity {
 
                 else{
                     Toast.makeText(getApplicationContext(), "Wrong, try again", Toast.LENGTH_SHORT).show();
+                    triesText.setText(Integer.toString(--tries));
+                    if(tries == 0){
+                        endGame();
+                    }
                 }
             }
         });
@@ -221,7 +291,7 @@ public class GamePlay extends AppCompatActivity {
     public void endGame(){
             //Toast.makeText(getApplicationContext(),"Do better next time", Toast.LENGTH_LONG);
 
-            startActivity(mainActivityIntent);
+            startActivity(gameOverIntent);
     }
 
 }
