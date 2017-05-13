@@ -2,8 +2,6 @@ package com.googleappliedandroid.supermemory;
 
 import android.content.Intent;
 import android.os.Handler;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.IntegerRes;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,13 +10,10 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
-
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.HashMap;
-import java.util.ListIterator;
 import java.util.Queue;
 
 public class GamePlay extends AppCompatActivity {
@@ -29,18 +24,21 @@ public class GamePlay extends AppCompatActivity {
     private HashMap<Card, Integer> cardMap;
     private ImageView card;
     private Button endGame;
+    private Button stopMem;
     private Game game;
     private Queue<Card> answer;
     CardButtons button1;
     CardButtons button2;
     CardButtons button3;
     CardButtons button4;
+    Intent mainActivityIntent;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_play);
+        mainActivityIntent = new Intent(GamePlay.this, MainActivity.class);
         final Intent intent = getIntent();
         card = (ImageView) findViewById(R.id.card);
-        endGame = (Button)findViewById(R.id.end_game);
+        stopMem = (Button) findViewById(R.id.stop_memorize);
         cardNumber = intent.getIntExtra("CARD_NUMBER", 5);
         time = intent.getIntExtra("TIME", 60);
         cardMap = new HashMap<>();
@@ -53,14 +51,12 @@ public class GamePlay extends AppCompatActivity {
         }
 
         answer = new LinkedList<>(game.getSequence());
-//        endGame.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Toast.makeText(getApplicationContext(),"Do better next time", Toast.LENGTH_LONG);
-//                Intent intent1 = new Intent(GamePlay.this, MainActivity.class);
-//                startActivity(intent1);
-//            }
-//        });
+        stopMem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(mainActivityIntent);
+            }
+        });
 
         card.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -102,23 +98,31 @@ public class GamePlay extends AppCompatActivity {
                 card.setVisibility(View.INVISIBLE);
                 setContentView(R.layout.activity_restore_order);
                 setupChoiceButtons();
+                endGame = (Button)findViewById(R.id.end_game);
+                endGame.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //Toast.makeText(getApplicationContext(),"Do better next time", Toast.LENGTH_LONG);
+                        startActivity(mainActivityIntent);
+                    }
+                });
                 //updateChoices();
             }
         };
         timerHandle.postDelayed(timerRunnable, timer);
     }
 
-    public void getAnswer(){
-//        CardButtons[] buttons = {(CardButtons) findViewById(R.id.a),(CardButtons)findViewById(R.id.b),(CardButtons)findViewById(R.id.c),(CardButtons)findViewById(R.id.d)};
-//        for(int i = 0; i < buttons.length; i++){
-//            buttons[i].setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    if(v.==game.getSequence().poll())
-//                }
-//            });
-//        }
-    }
+//    public void getAnswer(){
+////        CardButtons[] buttons = {(CardButtons) findViewById(R.id.a),(CardButtons)findViewById(R.id.b),(CardButtons)findViewById(R.id.c),(CardButtons)findViewById(R.id.d)};
+////        for(int i = 0; i < buttons.length; i++){
+////            buttons[i].setOnClickListener(new View.OnClickListener() {
+////                @Override
+////                public void onClick(View v) {
+////                    if(v.==game.getSequence().poll())
+////                }
+////            });
+////        }
+//    }
 
     public void updateChoices(CardButtons[] buttons){
         Card[] choices = game.guesses();
@@ -216,8 +220,8 @@ public class GamePlay extends AppCompatActivity {
     }
     public void endGame(){
             //Toast.makeText(getApplicationContext(),"Do better next time", Toast.LENGTH_LONG);
-            Intent intent1 = new Intent(GamePlay.this, MainActivity.class);
-            startActivity(intent1);
+
+            startActivity(mainActivityIntent);
     }
 
 }
